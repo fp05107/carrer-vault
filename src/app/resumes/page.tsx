@@ -40,7 +40,7 @@ export default async function ResumesPage() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {resumes.map((resume) => (
+                        {resumes.map((resume: any) => (
                             <Card key={resume.id} className="glass-card hover:border-primary/50 transition-colors group">
                                 <CardHeader>
                                     <CardTitle className="truncate">{resume.title}</CardTitle>

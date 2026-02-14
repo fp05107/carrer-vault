@@ -14,7 +14,7 @@ export async function getResumes() {
     const session = await auth()
     if (!session?.user?.id) return []
 
-    return await db.resume.findMany({
+    return await (db as any).resume.findMany({
         where: { userId: session.user.id },
         orderBy: { updatedAt: "desc" },
     })
@@ -24,7 +24,7 @@ export async function getResume(id: string) {
     const session = await auth()
     if (!session?.user?.id) return null
 
-    return await db.resume.findUnique({
+    return await (db as any).resume.findUnique({
         where: { id, userId: session.user.id },
     })
 }
@@ -55,7 +55,7 @@ export async function createResume(title: string) {
 \\end{document}
 `
 
-    const resume = await db.resume.create({
+    const resume = await (db as any).resume.create({
         data: {
             title,
             content: defaultContent,
@@ -74,7 +74,7 @@ export async function updateResume(id: string, values: z.infer<typeof resumeSche
     const result = resumeSchema.safeParse(values)
     if (!result.success) throw new Error("Invalid data")
 
-    await db.resume.update({
+    await (db as any).resume.update({
         where: { id, userId: session.user.id },
         data: {
             title: result.data.title,
@@ -90,7 +90,7 @@ export async function deleteResume(id: string) {
     const session = await auth()
     if (!session?.user?.id) throw new Error("Unauthorized")
 
-    await db.resume.delete({
+    await (db as any).resume.delete({
         where: { id, userId: session.user.id },
     })
 

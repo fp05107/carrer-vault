@@ -28,13 +28,25 @@ export async function createApplication(formData: FormData) {
     }
 
     const arrayBuffer = await file.arrayBuffer();
-    const buffer = new Uint8Array(arrayBuffer);
+    const buffer = Buffer.from(arrayBuffer);
+
+    const timestamp = Date.now();
+    const safeFilename = file.name.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+    const publicId = `resumes/${safeFilename}_${timestamp}.pdf`; // Explicitly add .pdf extension
+
+    console.log(`Uploading file: ${file.name}, Public ID: ${publicId}`);
 
     const uploadResult = await new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
-            { resource_type: "auto", folder: "resumes" }, // auto to detect pdf properly
+            {
+                resource_type: "raw",
+                public_id: publicId,   // Use explicit public_id with extension
+                access_mode: "public",
+                type: "upload"
+            },
             (error, result) => {
                 if (error) {
+                    console.error("Cloudinary Upload Error:", error);
                     reject(error);
                     return;
                 }
@@ -44,7 +56,9 @@ export async function createApplication(formData: FormData) {
         uploadStream.end(buffer);
     }) as any;
 
-    await db.application.create({
+    console.log("Upload Result:", uploadResult);
+
+    await (db as any).application.create({
         data: {
             company,
             role,
@@ -67,7 +81,7 @@ export async function deleteApplication(id: string) {
 
     const application = await db.application.findUnique({
         where: { id },
-    });
+    }) as any; // Cast to any to avoid TS error if types are out of sync
 
     if (!application) {
         throw new Error("Application not found");

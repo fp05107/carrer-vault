@@ -1,5 +1,6 @@
 import { AddApplicationDialog } from "@/components/add-application-dialog";
 import { DeleteApplicationButton } from "@/components/delete-application-button";
+import { ViewJDDialog } from "@/components/view-jd-dialog";
 import { SignOutButton } from "@/components/sign-out-button";
 import { VaultStats } from "@/components/vault-stats";
 import { AppFooter } from "@/components/app-footer";
@@ -21,11 +22,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const dynamic = "force-dynamic";
 
+import { LandingPage } from "@/components/landing-page";
+
 export default async function DashboardPage() {
   const session = await auth();
 
   if (!session || !session.user) {
-    redirect("/login");
+    return <LandingPage />;
   }
 
   const applications = await db.application.findMany({
@@ -137,7 +140,12 @@ export default async function DashboardPage() {
                               </a>
                             )}
                           </TableCell>
-                          <TableCell className="text-right">
+                          <TableCell className="text-right flex justify-end gap-1">
+                            <ViewJDDialog
+                              company={app.company}
+                              role={app.role}
+                              jobDescription={app.jobDescription}
+                            />
                             <DeleteApplicationButton id={app.id} />
                           </TableCell>
                         </TableRow>
