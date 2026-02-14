@@ -8,14 +8,19 @@ export const authConfig = {
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
             const isOnDashboard = nextUrl.pathname === '/';
+            const isOnResumes = nextUrl.pathname.startsWith('/resumes');
             const isOnAuth = nextUrl.pathname.startsWith('/login') || nextUrl.pathname.startsWith('/signup');
 
-            if (isOnDashboard) {
-                if (isLoggedIn) return true;
-                return false; // Redirect unauthenticated users to login page
-            } else if (isLoggedIn && isOnAuth) {
-                return Response.redirect(new URL('/', nextUrl));
+            if (isOnAuth) {
+                if (isLoggedIn) return Response.redirect(new URL('/', nextUrl));
+                return true;
             }
+
+            if (isOnResumes && !isLoggedIn) {
+                return false;
+            }
+
+            // Allow access to root (Landing Page) and other routes
             return true;
         },
     },
