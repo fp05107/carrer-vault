@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { v2 as cloudinary } from 'cloudinary';
 import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -11,9 +12,14 @@ cloudinary.config({
 });
 
 export async function createApplication(formData: FormData) {
+    const session = await auth();
+    if (!session || !session.user || !session.user.id) {
+        throw new Error("Unauthorized");
+    }
+
     const company = formData.get("company") as string;
     const role = formData.get("role") as string;
-    const status = formData.get("status") as "APPLIED" | "INTERVIEWING" | "OFFER" | "REJECTED";
+    const status = formData.get("status") as "APPLIED" | "INTERVIEWING" | "OFFER" | "REJECTED"; // Type assertion
     const jobDescription = formData.get("jobDescription") as string;
     const file = formData.get("resume") as File;
 
@@ -25,8 +31,8 @@ export async function createApplication(formData: FormData) {
     const buffer = new Uint8Array(arrayBuffer);
 
     const uploadResult = await new Promise((resolve, reject) => {
-        cloudinary.uploader.upload_stream(
-            { resource_type: "raw", folder: "resumes" }, // raw for PDF? or auto
+        const uploadStream = cloudinary.uploader.upload_stream(
+            { resource_type: "auto", folder: "resumes" }, // auto to detect pdf properly
             (error, result) => {
                 if (error) {
                     reject(error);
@@ -34,7 +40,8 @@ export async function createApplication(formData: FormData) {
                 }
                 resolve(result);
             }
-        ).end(buffer);
+        );
+        uploadStream.end(buffer);
     }) as any;
 
     await db.application.create({
@@ -45,6 +52,7 @@ export async function createApplication(formData: FormData) {
             jobDescription,
             resumeUrl: uploadResult.secure_url,
             resumePublicId: uploadResult.public_id,
+            userId: session.user.id,
         },
     });
 
@@ -52,6 +60,11 @@ export async function createApplication(formData: FormData) {
 }
 
 export async function deleteApplication(id: string) {
+    const session = await auth();
+    if (!session || !session.user || !session.user.id) {
+        throw new Error("Unauthorized");
+    }
+
     const application = await db.application.findUnique({
         where: { id },
     });
@@ -60,8 +73,13 @@ export async function deleteApplication(id: string) {
         throw new Error("Application not found");
     }
 
+    // Only allow deleting own applications
+    if (application.userId !== session.user.id) {
+        throw new Error("FORBIDDEN: You cannot delete this application");
+    }
+
     if (application.resumePublicId) {
-        await cloudinary.uploader.destroy(application.resumePublicId, { resource_type: "raw" });
+        await cloudinary.uploader.destroy(application.resumePublicId);
     }
 
     await db.application.delete({

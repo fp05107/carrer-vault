@@ -85,56 +85,59 @@ export function ApplicationForm({ onSuccess }: ApplicationFormProps) {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                    control={form.control}
-                    name="company"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Company</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Acme Corp" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="role"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Job Role</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Frontend Engineer" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="status"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Status</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                        control={form.control}
+                        name="company"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Company</FormLabel>
                                 <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select status" />
-                                    </SelectTrigger>
+                                    <Input placeholder="Acme Corp" {...field} />
                                 </FormControl>
-                                <SelectContent>
-                                    <SelectItem value="APPLIED">Applied</SelectItem>
-                                    <SelectItem value="INTERVIEWING">Interviewing</SelectItem>
-                                    <SelectItem value="OFFER">Offer</SelectItem>
-                                    <SelectItem value="REJECTED">Rejected</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="role"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Job Role</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Frontend Engineer" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="status"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Status</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select status" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="APPLIED">Applied</SelectItem>
+                                        <SelectItem value="INTERVIEWING">Interviewing</SelectItem>
+                                        <SelectItem value="OFFER">Offer</SelectItem>
+                                        <SelectItem value="REJECTED">Rejected</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+
                 <FormField
                     control={form.control}
                     name="jobDescription"
@@ -142,7 +145,11 @@ export function ApplicationForm({ onSuccess }: ApplicationFormProps) {
                         <FormItem>
                             <FormLabel>Job Description</FormLabel>
                             <FormControl>
-                                <Textarea placeholder="Paste JD coverage here..." {...field} />
+                                <Textarea
+                                    placeholder="Paste JD coverage here..."
+                                    className="min-h-[200px]"
+                                    {...field}
+                                />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
