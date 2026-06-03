@@ -1,4 +1,4 @@
-# Career Vault - Advanced Job Application Tracker
+# Career Vault - Development of a Secure Cloud-Based Career Management System
 
 Career Vault is a powerful, developer-first command center for managing your job search. Track applications, visualize your progress, and manage your resumes with military-grade precision.
 
