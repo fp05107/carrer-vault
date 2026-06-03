@@ -6,6 +6,7 @@ import { VaultStats } from "@/components/vault-stats";
 import { AppFooter } from "@/components/app-footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getApplications } from "@/app/actions";
 import {
   Table,
   TableBody,
@@ -14,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { db } from "@/lib/db";
+
 import { FileText, ExternalLink, Calendar, Briefcase } from "lucide-react";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -31,12 +32,8 @@ export default async function DashboardPage() {
     return <LandingPage />;
   }
 
-  const applications = await db.application.findMany({
-    where: {
-      userId: session.user.id,
-    },
-    orderBy: { appliedAt: "desc" },
-  });
+  // getApplications() is scoped to the current user and returns decrypted URLs
+  const applications = await getApplications();
 
   // Calculate Stats
   const total = applications.length;
